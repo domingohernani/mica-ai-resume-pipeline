@@ -1,10 +1,22 @@
-import express from "express";
-const app = express();
+import { extractor } from "./text-extractor.js";
 
-const PORT = process.env.PORT || 8080
-app.listen(3000, (err) => {
-    if (err) {
-        console.error(err);
+/**
+ * Cloud Function triggered when a file is uploaded to GCS
+ */
+export const processResume = async (reqOrEvent, res) => {
+    try {
+        const data = reqOrEvent?.body ?? reqOrEvent;
+        const extractedText = await extractor(data);
+        console.log(extractedText);
+
+
+        if (res) {
+            return res.status(200).send("Processed");
+        }
+    } catch (error) {
+        console.error("Error processing resume:", error);
+        if (res) {
+            return res.status(500).send("Error processing resume");
+        }
     }
-    console.log(`Server listening at PORT ${PORT}`);
-})
+}
