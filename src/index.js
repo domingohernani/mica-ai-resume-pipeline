@@ -1,5 +1,6 @@
 import { evaluator } from "./evaluator.js";
 import { jobPost } from "./job-post.js";
+import { recordEvaluation } from "./record-evaluation.js";
 import { extractor } from "./text-extractor.js";
 
 /**
@@ -8,7 +9,8 @@ import { extractor } from "./text-extractor.js";
 export const processResume = async (reqOrEvent, res) => {
     try {
         const data = reqOrEvent?.body ?? reqOrEvent;
-        const jobId = data.name.split("/")[0];
+        const jobId = data.jobId;
+        const applicationId = data.applicationId;
         // Fetch job post details
         const job = await jobPost(jobId);
         // Extracted text from the pdf uploaded
@@ -32,9 +34,8 @@ export const processResume = async (reqOrEvent, res) => {
         `;
 
         const evaluation = await evaluator(extractedText, jobDescription)
-
-        console.log(evaluation);
-
+        const result = await recordEvaluation(jobId, applicationId, evaluation)
+        console.log(result);
 
         if (res) {
             return res.status(200).send("Processed");
