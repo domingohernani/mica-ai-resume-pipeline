@@ -9,6 +9,7 @@ import { extractor } from "./text-extractor.js";
 export const processResume = async (reqOrEvent, res) => {
     try {
         const data = reqOrEvent?.body ?? reqOrEvent;
+        return;
         const filePath = data.name;
         const bucket = data.bucket;
 
