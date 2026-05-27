@@ -9,12 +9,21 @@ import { extractor } from "./text-extractor.js";
 export const processResume = async (reqOrEvent, res) => {
     try {
         const data = reqOrEvent?.body ?? reqOrEvent;
-        const jobId = data.jobId;
-        const applicationId = data.applicationId;
+        const filePath = data.name;
+        const bucket = data.bucket;
+
+        const pathParts = filePath ? filePath.split('/') : [];
+
+        if (pathParts.length !== 2) {
+            console.log(`Skipping: Path structure "${filePath}" is not in the expected 'jobId/fileName' format.`);
+            return;
+        }
+
+        const jobId = pathParts[0];
+        const fileName = pathParts[1];
+
         // Fetch job post details
         const job = await jobPost(jobId);
-        // Extracted text from the pdf uploaded
-        const extractedText = await extractor(data);
 
         const jobDescription = `
             Position: ${job.position}
@@ -33,7 +42,12 @@ export const processResume = async (reqOrEvent, res) => {
             ${job.skills.join(', ')}
         `;
 
+        // Extract the pdf upload through Cloud Storage
+        const extractedText = await extractor(bucket, jobId, fileName);
+
         const evaluation = await evaluator(extractedText, jobDescription)
+        // Use the uuid defined as a fileName
+        const applicationId = fileName.split('.')[0];
         const result = await recordEvaluation(jobId, applicationId, evaluation)
         console.log(result);
 
