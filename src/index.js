@@ -9,8 +9,6 @@ import { extractor } from "./text-extractor.js";
 export const processResume = async (reqOrEvent, res) => {
     try {
         const data = reqOrEvent?.body ?? reqOrEvent;
-        res.status(200).send("Clearing queue");
-        return;
         const filePath = data.name;
         const bucket = data.bucket;
 
