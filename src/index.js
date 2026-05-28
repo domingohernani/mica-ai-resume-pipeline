@@ -54,8 +54,7 @@ export const processResume = async (reqOrEvent, res) => {
         // Use the uuid defined as a fileName
         const applicationId = fileName.split('.')[0];
         const result = await recordEvaluation(jobId, applicationId, evaluation)
-        console.log(result);
-
+        console.log(`Evaluation created for Application ID${result.jobApplicationId} with ID ${result.id}`);
         return res.status(200).send("Processed");
     } catch (error) {
         console.error("Error processing resume:", error);
