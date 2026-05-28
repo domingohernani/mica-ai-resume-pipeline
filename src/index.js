@@ -22,6 +22,11 @@ export const processResume = async (reqOrEvent, res) => {
         const jobId = pathParts[0];
         const fileName = pathParts[1];
 
+        if (!fileName.endsWith('.pdf')) {
+            console.log(`Skipping non-PDF file: ${fileName}`);
+            return res.status(200).send("Processed");
+        }
+
         // Fetch job post details
         const job = await jobPost(jobId);
 
@@ -51,9 +56,7 @@ export const processResume = async (reqOrEvent, res) => {
         const result = await recordEvaluation(jobId, applicationId, evaluation)
         console.log(result);
 
-        if (res) {
-            return res.status(200).send("Processed");
-        }
+        return res.status(200).send("Processed");
     } catch (error) {
         console.error("Error processing resume:", error);
         if (res) {
